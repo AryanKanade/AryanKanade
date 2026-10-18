@@ -84,8 +84,9 @@ _Projects coming soon. Meanwhile, everything lives at [github.com/AryanKanade](h
 
 ## 🔭 Currently Working On
 
-- 🛡️ [**TrustLens**](https://github.com/AryanKanade/TrustLens)
-- 🤖 Learning Machine Learning & Natural Language Processing
+- MERN Stack Development
+- PostgreSql
+- Machine Learning
 
 ---
 
