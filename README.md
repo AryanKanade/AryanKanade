@@ -90,14 +90,6 @@
 
 ---
 
-## 🔭 Currently Working On
-
-- MERN Stack Development
-- PostgreSql
-- Machine Learning
-
----
-
 ## 🐍 Contribution Snake
 
 <div align="center">
@@ -109,6 +101,14 @@
 </picture>
 
 </div>
+
+---
+
+## 🔭 Currently Working On
+
+- MERN Stack Development
+- PostgreSql
+- Machine Learning
 
 ---
 
