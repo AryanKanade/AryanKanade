@@ -13,10 +13,8 @@
 
 - 🎓 Computer Science student at **Ramdeobaba University** (CSE '28)
 - 🛠️ I build backends with **Node.js & Express**
-- 🔭 Currently working on [**TrustLens**](https://github.com/AryanKanade/TrustLens)
 - 🌱 Currently learning **Machine Learning**
 - 📚 Grinding **Data Structures & Algorithms in Java**
-- 🧠 Coursework: Distributed Computing, Compiler Design, IoT/Embedded Systems
 - 💬 Ask me about **Backend Development**
 - 📫 Reach me at **aryankanade69@gmail.com**
 
@@ -68,7 +66,7 @@
 <img src="https://github-readme-stats.vercel.app/api?username=AryanKanade&show_icons=true&theme=tokyonight&hide_border=true&count_private=true" />
 <img src="https://github-readme-streak-stats.herokuapp.com/?user=AryanKanade&theme=tokyonight&hide_border=true" />
 
-<img height="180" src="https://github-readme-stats.vercel.app/api/top-langs/?username=AryanKanade&layout=compact&theme=tokyonight&hide_border=true" />
+<img height="200" src="https://github-readme-stats.vercel.app/api/top-langs/?username=AryanKanade&layout=compact&theme=tokyonight&hide_border=true" />
 
 
 </div>
