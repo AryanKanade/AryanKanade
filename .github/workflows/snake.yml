@@ -1,4 +1,4 @@
-name: Generate Snake
+name: Generate Snake & Stats
 
 on:
   schedule:
@@ -15,6 +15,7 @@ jobs:
   generate:
     runs-on: ubuntu-latest
     steps:
+      # 1) Contribution snake
       - uses: Platane/snk/svg-only@v3
         with:
           github_user_name: ${{ github.repository_owner }}
@@ -22,6 +23,162 @@ jobs:
             dist/github-snake.svg
             dist/github-snake-dark.svg?palette=github-dark
 
+      # 2) Productivity card (generated from your public GitHub activity)
+      - name: Build productivity card
+        env:
+          GH_USER: ${{ github.repository_owner }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          cat > gen.js << 'EOF'
+          const fs = require('fs');
+
+          async function main() {
+            const user = process.env.GH_USER;
+            const token = process.env.GH_TOKEN;
+            const tzMinutes = 330; // IST (UTC+5:30)
+
+            const headers = { 'User-Agent': 'productivity-card', Accept: 'application/vnd.github+json' };
+            if (token) headers.Authorization = `Bearer ${token}`;
+            const get = async (url) => {
+              const r = await fetch(url, { headers });
+              if (!r.ok) throw new Error(`${r.status} ${url}`);
+              return r.json();
+            };
+
+            // ---- data ----
+            const repos = [];
+            for (let p = 1; p <= 5; p++) {
+              const page = await get(`https://api.github.com/users/${user}/repos?per_page=100&page=${p}&type=owner`);
+              repos.push(...page);
+              if (page.length < 100) break;
+            }
+            const events = [];
+            for (let p = 1; p <= 3; p++) {
+              try {
+                const page = await get(`https://api.github.com/users/${user}/events/public?per_page=100&page=${p}`);
+                events.push(...page);
+                if (page.length < 100) break;
+              } catch (e) { break; }
+            }
+
+            const own = repos.filter((r) => !r.fork);
+            const stars = own.reduce((s, r) => s + r.stargazers_count, 0);
+            const langCount = {};
+            own.forEach((r) => { if (r.language) langCount[r.language] = (langCount[r.language] || 0) + 1; });
+            const langs = Object.entries(langCount).sort((a, b) => b[1] - a[1]).slice(0, 5);
+            const langTotal = langs.reduce((s, l) => s + l[1], 0) || 1;
+
+            const grid = Array.from({ length: 7 }, () => Array(24).fill(0)); // Mon..Sun x hour
+            const hours = Array(24).fill(0);
+            const dayTotals = Array(7).fill(0);
+            const activeDays = new Set();
+            let commits = 0;
+            const cutoff = Date.now() - 90 * 864e5;
+            for (const e of events) {
+              if (e.type !== 'PushEvent') continue;
+              const t = new Date(e.created_at).getTime();
+              if (t < cutoff) continue;
+              const n = (e.payload && (e.payload.distinct_size ?? e.payload.size)) || 1;
+              const local = new Date(t + tzMinutes * 60000);
+              const dow = (local.getUTCDay() + 6) % 7; // Mon=0
+              const hr = local.getUTCHours();
+              grid[dow][hr] += n;
+              hours[hr] += n;
+              dayTotals[dow] += n;
+              commits += n;
+              activeDays.add(local.toISOString().slice(0, 10));
+            }
+
+            const dayNames = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+            const fullDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+            const fmtHour = (h) => `${h % 12 === 0 ? 12 : h % 12} ${h < 12 ? 'AM' : 'PM'}`;
+            const peakHour = hours.indexOf(Math.max(...hours));
+            const peakDay = dayTotals.indexOf(Math.max(...dayTotals));
+            const hasData = commits > 0;
+
+            // ---- svg ----
+            const W = 840, H = 372;
+            const colors = { JavaScript: '#f1e05a', Java: '#ED8B00', Python: '#3572A5', HTML: '#e34c26', CSS: '#563d7c', C: '#a8b9cc', 'C++': '#f34b7d', TypeScript: '#3178c6', Dart: '#00B4AB', Kotlin: '#A97BFF', Shell: '#89e051', Jupyter: '#DA5B0B', 'Jupyter Notebook': '#DA5B0B', EJS: '#a91e50', SCSS: '#c6538c' };
+            const fallback = ['#7c3aed', '#38bdf8', '#f472b6', '#34d399', '#fbbf24'];
+            const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;');
+
+            const tile = (x, label, value, sub) => `
+              <g transform="translate(${x},78)">
+                <rect width="182" height="74" rx="12" fill="#1f2335" stroke="#2f3549"/>
+                <text x="18" y="26" class="muted">${label}</text>
+                <text x="18" y="56" class="big">${value}</text>
+                <text x="164" y="56" class="sub" text-anchor="end">${sub}</text>
+              </g>`;
+
+            const maxCell = Math.max(1, ...grid.flat());
+            const cell = 15, gap = 3, gx = 66, gy = 214;
+            let cells = '';
+            for (let d = 0; d < 7; d++) {
+              cells += `<text x="${gx - 12}" y="${gy + d * (cell + gap) + 11}" class="muted" text-anchor="end">${dayNames[d]}</text>`;
+              for (let h = 0; h < 24; h++) {
+                const v = grid[d][h];
+                let fill = '#24283b', op = 1;
+                if (v > 0) { fill = '#a78bfa'; op = 0.28 + 0.72 * (v / maxCell); }
+                cells += `<rect x="${gx + h * (cell + gap)}" y="${gy + d * (cell + gap)}" width="${cell}" height="${cell}" rx="4" fill="${fill}" opacity="${op.toFixed(2)}"/>`;
+              }
+            }
+            let hourLabels = '';
+            [0, 6, 12, 18, 23].forEach((h) => {
+              hourLabels += `<text x="${gx + h * (cell + gap) + cell / 2}" y="${gy - 8}" class="muted" text-anchor="middle">${h === 23 ? '11p' : h === 0 ? '12a' : h === 12 ? '12p' : h > 12 ? h - 12 + 'p' : h + 'a'}</text>`;
+            });
+
+            // languages
+            const lx = 548, ly = 214;
+            let langSvg = `<text x="${lx}" y="${ly - 26}" class="head">Top languages</text>`;
+            if (langs.length === 0) langSvg += `<text x="${lx}" y="${ly + 10}" class="muted">No language data yet</text>`;
+            langs.forEach(([name, n], i) => {
+              const pct = Math.round((n / langTotal) * 100);
+              const y = ly + i * 27;
+              const c = colors[name] || fallback[i % fallback.length];
+              langSvg += `
+                <text x="${lx}" y="${y + 9}" class="lang">${esc(name)}</text>
+                <text x="${lx + 250}" y="${y + 9}" class="muted" text-anchor="end">${pct}%</text>
+                <rect x="${lx}" y="${y + 15}" width="250" height="5" rx="2.5" fill="#24283b"/>
+                <rect x="${lx}" y="${y + 15}" width="${Math.max(6, 250 * n / langTotal).toFixed(1)}" height="5" rx="2.5" fill="${c}"/>`;
+            });
+
+            const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="img" aria-label="Productivity snapshot for ${esc(user)}">
+            <defs>
+              <linearGradient id="g" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#7c3aed"/><stop offset="1" stop-color="#38bdf8"/></linearGradient>
+              <style>
+                text{font-family:'Segoe UI',Ubuntu,'Helvetica Neue',Arial,sans-serif}
+                .title{font-size:20px;font-weight:700;fill:#c0caf5}
+                .head{font-size:13px;font-weight:600;fill:#c0caf5}
+                .muted{font-size:11px;fill:#787c99}
+                .sub{font-size:11px;fill:#a9b1d6}
+                .big{font-size:26px;font-weight:700;fill:#c0caf5}
+                .lang{font-size:12px;fill:#c0caf5}
+              </style>
+            </defs>
+            <rect x="0.5" y="0.5" width="${W - 1}" height="${H - 1}" rx="16" fill="#1a1b27" stroke="#2f3549"/>
+            <rect x="30" y="26" width="5" height="22" rx="2.5" fill="url(#g)"/>
+            <text x="46" y="44" class="title">Productivity Snapshot</text>
+            <text x="${W - 30}" y="44" class="muted" text-anchor="end">last 90 days · public activity · IST</text>
+            ${tile(30, 'COMMITS', commits, hasData ? 'pushed' : 'none yet')}
+            ${tile(232, 'ACTIVE DAYS', activeDays.size, 'of 90')}
+            ${tile(434, 'PUBLIC REPOS', own.length, 'owned')}
+            ${tile(636, 'STARS EARNED', stars, 'total')}
+            <text x="30" y="${gy - 26}" class="head">Weekly rhythm</text>
+            <text x="${gx + 24 * (cell + gap) - gap}" y="${gy - 26}" class="muted" text-anchor="end">${hasData ? `peak ${fmtHour(peakHour)} · busiest ${fullDays[peakDay]}` : 'push some code!'}</text>
+            ${hourLabels}
+            ${cells}
+            ${langSvg}
+          </svg>`;
+
+            fs.mkdirSync('dist', { recursive: true });
+            fs.writeFileSync('dist/productivity.svg', svg);
+            console.log({ commits, active: activeDays.size, repos: own.length, stars, langs, events: events.length });
+          }
+          main().catch((e) => { console.error(e); process.exit(1); });
+          EOF
+          node gen.js
+
+      # 3) Publish everything to the `output` branch
       - uses: crazy-max/ghaction-github-pages@v3.1.0
         with:
           target_branch: output
