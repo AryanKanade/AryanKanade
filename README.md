@@ -116,9 +116,9 @@
 
 ## 🔭 Currently Working On
 
-- MERN Stack Development
-- PostgreSql
-- Machine Learning
+- ⚛️ MERN Stack Development
+- 🐘 PostgreSQL
+- 🤖 Machine Learning
 
 ---
 
@@ -136,6 +136,8 @@
 </div>
 
 <div align="center">
+
+<sub>🚀 Thanks for stopping by, let's build something together</sub>
 
 ![footer](https://capsule-render.vercel.app/api?type=waving&color=gradient&customColorList=6,11,20&height=120&section=footer)
 
