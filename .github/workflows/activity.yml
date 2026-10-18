@@ -1,0 +1,131 @@
+name: Generate Activity Graph
+
+on:
+  schedule:
+    - cron: "0 1 * * *"   # runs daily
+  workflow_dispatch:       # lets you run it manually
+
+permissions:
+  contents: write
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Build activity graph
+        env:
+          GH_USER: ${{ github.repository_owner }}
+        run: |
+          cat > activity.js << 'EOF'
+          const fs = require('fs');
+
+          async function main() {
+            const user = process.env.GH_USER;
+            const DAYS = 30;
+
+            // Public contribution calendar (the same data your profile heatmap shows)
+            const res = await fetch(`https://github.com/users/${user}/contributions`, {
+              headers: { 'User-Agent': 'Mozilla/5.0 activity-graph' },
+            });
+            if (!res.ok) throw new Error(`contributions page returned ${res.status}`);
+            const html = await res.text();
+
+            const cells = {};
+            for (const m of html.matchAll(/data-date="(\d{4}-\d{2}-\d{2})"\s+id="([^"]+)"/g)) cells[m[2]] = { date: m[1], count: 0 };
+            for (const m of html.matchAll(/<tool-tip[^>]*\sfor="([^"]+)"[^>]*>([^<]*)<\/tool-tip>/g)) {
+              const c = cells[m[1]];
+              if (!c) continue;
+              const n = m[2].match(/^(\d+)\s+contribution/);
+              c.count = n ? parseInt(n[1], 10) : 0;
+            }
+            const all = Object.values(cells).sort((a, b) => a.date.localeCompare(b.date));
+            if (all.length === 0) throw new Error('could not parse contribution calendar');
+
+            // last N days up to today (calendar may include future empty cells)
+            const today = new Date().toISOString().slice(0, 10);
+            const days = all.filter((d) => d.date <= today).slice(-DAYS);
+            const counts = days.map((d) => d.count);
+            const total = counts.reduce((a, b) => a + b, 0);
+            const best = Math.max(...counts);
+            const bestDay = days[counts.indexOf(best)];
+            const activeDays = counts.filter((c) => c > 0).length;
+
+            // ---- svg geometry ----
+            const W = 840, H = 300;
+            const L = 56, R = 28, T = 92, B = 52;
+            const cw = W - L - R, ch = H - T - B;
+            const yMax = Math.max(4, Math.ceil(best / 4) * 4);
+            const x = (i) => L + (i * cw) / (days.length - 1);
+            const y = (v) => T + ch - (v / yMax) * ch;
+            const pts = counts.map((v, i) => [x(i), y(v)]);
+
+            // smooth path (Catmull-Rom -> cubic bezier), clamped so it never dips below the axis
+            const base = T + ch;
+            const clampY = (v) => Math.min(base, Math.max(T, v));
+            let d = `M ${pts[0][0].toFixed(1)} ${pts[0][1].toFixed(1)}`;
+            for (let i = 0; i < pts.length - 1; i++) {
+              const p0 = pts[i - 1] || pts[i], p1 = pts[i], p2 = pts[i + 1], p3 = pts[i + 2] || p2;
+              const c1x = p1[0] + (p2[0] - p0[0]) / 6, c1y = clampY(p1[1] + (p2[1] - p0[1]) / 6);
+              const c2x = p2[0] - (p3[0] - p1[0]) / 6, c2y = clampY(p2[1] - (p3[1] - p1[1]) / 6);
+              d += ` C ${c1x.toFixed(1)} ${c1y.toFixed(1)}, ${c2x.toFixed(1)} ${c2y.toFixed(1)}, ${p2[0].toFixed(1)} ${p2[1].toFixed(1)}`;
+            }
+            const area = `${d} L ${pts[pts.length - 1][0].toFixed(1)} ${base} L ${pts[0][0].toFixed(1)} ${base} Z`;
+
+            const fmt = (s) => { const dt = new Date(s + 'T00:00:00Z'); return dt.toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' }); };
+
+            let grid = '';
+            for (let g = 0; g <= 4; g++) {
+              const v = (yMax / 4) * g, yy = y(v);
+              grid += `<line x1="${L}" y1="${yy.toFixed(1)}" x2="${W - R}" y2="${yy.toFixed(1)}" stroke="#2a2e45" stroke-dasharray="${g === 0 ? '0' : '4 5'}"/>`;
+              grid += `<text x="${L - 12}" y="${(yy + 4).toFixed(1)}" class="muted" text-anchor="end">${Math.round(v)}</text>`;
+            }
+            let xl = '';
+            days.forEach((dd, i) => {
+              if (i % 5 === 0 || i === days.length - 1) xl += `<text x="${x(i).toFixed(1)}" y="${H - 22}" class="muted" text-anchor="middle">${fmt(dd.date)}</text>`;
+            });
+            const dots = pts.map((p, i) => counts[i] > 0 ? `<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="3.2" fill="#1a1b27" stroke="#a78bfa" stroke-width="2"/>` : '').join('');
+            const bi = counts.indexOf(best);
+            const peak = best > 0 ? `<circle cx="${pts[bi][0].toFixed(1)}" cy="${pts[bi][1].toFixed(1)}" r="5" fill="#38bdf8" stroke="#1a1b27" stroke-width="2"/>` : '';
+
+            const stat = (px, label, value) => `<text x="${px}" y="40" class="big">${value}</text><text x="${px}" y="58" class="muted">${label}</text>`;
+
+            const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="img" aria-label="Contribution activity for ${user}, last ${DAYS} days">
+            <defs>
+              <linearGradient id="line" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#7c3aed"/><stop offset="1" stop-color="#38bdf8"/></linearGradient>
+              <linearGradient id="fill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7c3aed" stop-opacity="0.38"/><stop offset="1" stop-color="#7c3aed" stop-opacity="0"/></linearGradient>
+              <style>
+                text{font-family:'Segoe UI',Ubuntu,'Helvetica Neue',Arial,sans-serif}
+                .title{font-size:18px;font-weight:700;fill:#c0caf5}
+                .big{font-size:22px;font-weight:700;fill:#c0caf5}
+                .muted{font-size:11px;fill:#787c99}
+              </style>
+            </defs>
+            <rect x="0.5" y="0.5" width="${W - 1}" height="${H - 1}" rx="16" fill="#1a1b27" stroke="#2f3549"/>
+            <rect x="${L}" y="24" width="4" height="40" rx="2" fill="url(#line)"/>
+            <text x="${L + 16}" y="40" class="title">Contribution Activity</text>
+            <text x="${L + 16}" y="58" class="muted">last ${DAYS} days · ${fmt(days[0].date)} – ${fmt(days[days.length - 1].date)}</text>
+            ${stat(W - R - 270, 'CONTRIBUTIONS', total)}
+            ${stat(W - R - 160, 'ACTIVE DAYS', activeDays + '/' + days.length)}
+            ${stat(W - R - 50, 'BEST DAY', best)}
+            ${grid}
+            <path d="${area}" fill="url(#fill)"/>
+            <path d="${d}" fill="none" stroke="url(#line)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+            ${dots}
+            ${peak}
+            ${xl}
+          </svg>`;
+
+            fs.mkdirSync('dist', { recursive: true });
+            fs.writeFileSync('dist/activity-graph.svg', svg);
+            console.log({ total, activeDays, best, bestDay: bestDay.date, days: days.length });
+          }
+          main().catch((e) => { console.error(e); process.exit(1); });
+          EOF
+          node activity.js
+
+      - uses: crazy-max/ghaction-github-pages@v3.1.0
+        with:
+          target_branch: activity
+          build_dir: dist
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
