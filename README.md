@@ -4,8 +4,7 @@
 
 [![Typing SVG](https://readme-typing-svg.demolab.com?font=Fira+Code&weight=600&size=22&duration=3000&pause=1000&color=7C3AED&center=true&vCenter=true&width=650&lines=CSE+Student+%40+Ramdeobaba+University;Backend+Developer+%7C+Node.js+%2B+Express;Machine+Learning+%26+Automation;Solving+DSA+in+Java;Building+things+that+ship)](https://git.io/typing-svg)
 
-![Profile Views](https://komarev.com/ghpvc/?username=aryankanade&label=Profile%20Views&color=7c3aed&style=flat)
-
+[![Hits](https://hits.sh/github.com/AryanKanade.svg?style=for-the-badge&label=Profile%20Views&color=7c3aed)](https://hits.sh/github.com/AryanKanade/)
 </div>
 
 ---
