@@ -13,11 +13,11 @@
 ## 👋 About Me
 
 - 🎓 Computer Science student at **Ramdeobaba University** (CSE '28)
-- 🛠️ I build backends with **Node.js & Express** and ship team projects through **IDEA LAB**
+- 🛠️ I build backends with **Node.js & Express**
 - 🔭 Currently working on [**TrustLens**](https://github.com/AryanKanade/TrustLens)
-- 🌱 Currently learning **Machine Learning** and **Natural Language Processing**
+- 🌱 Currently learning **Machine Learning**
 - 📚 Grinding **Data Structures & Algorithms in Java**
-- 🧠 Coursework: Distributed Computing, Compiler Design, IoT/Embedded Systems, Android Development
+- 🧠 Coursework: Distributed Computing, Compiler Design, IoT/Embedded Systems
 - 💬 Ask me about **Backend Development**
 - 📫 Reach me at **aryankanade69@gmail.com**
 
@@ -57,7 +57,6 @@
 ![Figma](https://img.shields.io/badge/Figma-F24E1E?style=for-the-badge&logo=figma&logoColor=white)
 ![AWS](https://img.shields.io/badge/AWS-232F3E?style=for-the-badge&logo=amazonwebservices&logoColor=white)
 ![Azure](https://img.shields.io/badge/Azure-0078D4?style=for-the-badge&logo=microsoftazure&logoColor=white)
-![Android](https://img.shields.io/badge/Android-3DDC84?style=for-the-badge&logo=android&logoColor=white)
 
 </div>
 
