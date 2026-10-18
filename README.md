@@ -2,7 +2,7 @@
 
 ![header](https://capsule-render.vercel.app/api?type=waving&color=gradient&customColorList=6,11,20&height=220&section=header&text=Aryan%20Kanade&fontSize=60&fontAlignY=36&desc=MERN%20Developer%20%C2%B7%20DSA%20%C2%B7%20AI%2FML&descAlignY=58&animation=fadeIn)
 
-[![Typing SVG](https://readme-typing-svg.demolab.com?font=Fira+Code&weight=600&size=22&duration=3000&pause=1000&color=7C3AED&center=true&vCenter=true&width=650&lines=CSE+Student+%40+Ramdeobaba+University;Backend+Developer+%7C+Node.js+%2B+Express;Learning+Machine+Learning+%26+NLP;Solving+DSA+in+Java;Building+things+that+ship)](https://git.io/typing-svg)
+[![Typing SVG](https://readme-typing-svg.demolab.com?font=Fira+Code&weight=600&size=22&duration=3000&pause=1000&color=7C3AED&center=true&vCenter=true&width=650&lines=CSE+Student+%40+Ramdeobaba+University;Backend+Developer+%7C+Node.js+%2B+Express;Machine+Learning+%26+Automation;Solving+DSA+in+Java;Building+things+that+ship)](https://git.io/typing-svg)
 
 ![Profile Views](https://komarev.com/ghpvc/?username=AryanKanade&label=Profile%20Views&color=7c3aed&style=for-the-badge)
 
