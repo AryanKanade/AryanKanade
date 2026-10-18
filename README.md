@@ -84,7 +84,7 @@
 
 <div align="center">
 
-<img width="100%" alt="Contribution activity graph" src="https://github-readme-activity-graph.vercel.app/graph?username=AryanKanade&theme=tokyo-night&hide_border=true&area=true&radius=10" />
+<img width="100%" alt="Contribution activity graph" src="https://raw.githubusercontent.com/AryanKanade/AryanKanade/activity/activity-graph.svg" />
 
 </div>
 
