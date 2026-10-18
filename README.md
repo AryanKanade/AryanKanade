@@ -137,8 +137,6 @@
 
 <div align="center">
 
-<sub>🚀 Thanks for stopping by, let's build something together</sub>
-
-![footer](https://capsule-render.vercel.app/api?type=waving&color=gradient&customColorList=6,11,20&height=120&section=footer)
+![footer](https://capsule-render.vercel.app/api?type=waving&color=gradient&customColorList=6,11,20&height=140&section=footer&text=Thanks%20for%20stopping%20by%2C%20let%27s%20build%20something%20together&fontSize=20&fontColor=ffffff&fontAlignY=65)
 
 </div>
