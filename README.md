@@ -61,6 +61,20 @@
 
 ---
 
+## 🤖 Machine Learning
+
+<div align="center">
+
+![NumPy](https://img.shields.io/badge/NumPy-013243?style=for-the-badge&logo=numpy&logoColor=white)
+![Pandas](https://img.shields.io/badge/Pandas-150458?style=for-the-badge&logo=pandas&logoColor=white)
+![Matplotlib](https://img.shields.io/badge/Matplotlib-11557C?style=for-the-badge&logoColor=white)
+![Seaborn](https://img.shields.io/badge/Seaborn-4C72B0?style=for-the-badge&logoColor=white)
+![scikit-learn](https://img.shields.io/badge/scikit--learn-F7931E?style=for-the-badge&logo=scikitlearn&logoColor=white)
+
+</div>
+
+---
+
 ## 📊 GitHub Stats
 
 <div align="center">
@@ -74,11 +88,21 @@
 
 ---
 
-## 🚀 Featured Projects
+## ⚡ Productivity Stats
 
-<!-- Coming soon: add 3-4 of your best projects here -->
+<div align="center">
 
-_Projects coming soon. Meanwhile, everything lives at [github.com/AryanKanade](https://github.com/AryanKanade?tab=repositories)._
+<img width="100%" src="https://github-readme-activity-graph.vercel.app/graph?username=AryanKanade&theme=tokyo-night&hide_border=true&area=true&radius=10&custom_title=Contribution%20Activity%20%E2%80%94%20Last%2031%20Days" />
+
+<br>
+
+<img height="170" src="https://leetcard.jacoblin.cool/aryan_kanade?theme=dark&font=Fira%20Code&ext=heatmap" />
+
+<br>
+
+<img width="100%" src="https://github-profile-trophy.vercel.app/?username=AryanKanade&theme=tokyonight&no-frame=true&no-bg=true&row=1&column=7&margin-w=10" />
+
+</div>
 
 ---
 
