@@ -12,9 +12,10 @@ jobs:
   generate:
     runs-on: ubuntu-latest
     steps:
-      - name: Build activity graph
+      - name: Build activity graph and stat cards
         env:
           GH_USER: ${{ github.repository_owner }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           cat > activity.js << 'EOF'
           const fs = require('fs');
@@ -121,7 +122,163 @@ jobs:
           }
           main().catch((e) => { console.error(e); process.exit(1); });
           EOF
+          cat > stats.js << 'EOF'
+          const fs = require('fs');
+
+          async function main() {
+            const user = process.env.GH_USER;
+            const token = process.env.GH_TOKEN;
+            const apiHeaders = { 'User-Agent': 'stats-cards', Accept: 'application/vnd.github+json' };
+            if (token) apiHeaders.Authorization = `Bearer ${token}`;
+            const api = async (url) => {
+              const r = await fetch(url, { headers: apiHeaders });
+              if (!r.ok) throw new Error(`${r.status} ${url}`);
+              return r.json();
+            };
+
+            // ---------- contribution calendar (same data as your profile heatmap) ----------
+            const res = await fetch(`https://github.com/users/${user}/contributions`, { headers: { 'User-Agent': 'Mozilla/5.0 stats-cards' } });
+            if (!res.ok) throw new Error(`contributions page returned ${res.status}`);
+            const html = await res.text();
+            const cells = {};
+            for (const m of html.matchAll(/data-date="(\d{4}-\d{2}-\d{2})"\s+id="([^"]+)"/g)) cells[m[2]] = { date: m[1], count: 0 };
+            for (const m of html.matchAll(/<tool-tip[^>]*\sfor="([^"]+)"[^>]*>([^<]*)<\/tool-tip>/g)) {
+              const c = cells[m[1]];
+              if (!c) continue;
+              const n = m[2].match(/^(\d+)\s+contribution/);
+              c.count = n ? parseInt(n[1], 10) : 0;
+            }
+            const today = new Date().toISOString().slice(0, 10);
+            const days = Object.values(cells).filter((d) => d.date <= today).sort((a, b) => a.date.localeCompare(b.date));
+            if (!days.length) throw new Error('could not parse contribution calendar');
+
+            const total = days.reduce((s, d) => s + d.count, 0);
+            const activeDays = days.filter((d) => d.count > 0).length;
+
+            // streaks
+            let longest = { len: 0, start: null, end: null }, run = { len: 0, start: null };
+            for (const d of days) {
+              if (d.count > 0) {
+                if (run.len === 0) run.start = d.date;
+                run.len++;
+                if (run.len > longest.len) longest = { len: run.len, start: run.start, end: d.date };
+              } else run = { len: 0, start: null };
+            }
+            let idx = days.length - 1;
+            if (days[idx].count === 0) idx--; // today not over yet, doesn't break the streak
+            let cur = { len: 0, start: null, end: idx >= 0 ? days[idx].date : null };
+            while (idx >= 0 && days[idx].count > 0) { cur.len++; cur.start = days[idx].date; idx--; }
+            if (cur.len === 0) cur = { len: 0, start: null, end: null };
+
+            // ---------- profile + repos ----------
+            let profile = { followers: 0, public_repos: 0 };
+            let repos = [];
+            try {
+              profile = await api(`https://api.github.com/users/${user}`);
+              for (let p = 1; p <= 5; p++) {
+                const page = await api(`https://api.github.com/users/${user}/repos?per_page=100&page=${p}&type=owner`);
+                repos.push(...page);
+                if (page.length < 100) break;
+              }
+            } catch (e) { console.warn('repo data unavailable:', e.message); }
+            const own = repos.filter((r) => !r.fork);
+            const stars = own.reduce((s, r) => s + r.stargazers_count, 0);
+
+            const bytes = {};
+            for (const r of own) {
+              try {
+                const l = await api(`https://api.github.com/repos/${user}/${r.name}/languages`);
+                for (const [k, v] of Object.entries(l)) bytes[k] = (bytes[k] || 0) + v;
+              } catch (e) { if (r.language) bytes[r.language] = (bytes[r.language] || 0) + 1000; }
+            }
+            const langs = Object.entries(bytes).sort((a, b) => b[1] - a[1]).slice(0, 5);
+            const langTotal = Object.values(bytes).reduce((a, b) => a + b, 0) || 1;
+
+            // ---------- shared svg bits ----------
+            const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;');
+            const fmtDate = (s) => new Date(s + 'T00:00:00Z').toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' });
+            const range = (a, b) => (a && b ? (a === b ? fmtDate(a) : `${fmtDate(a)} – ${fmtDate(b)}`) : 'no streak yet');
+            const defs = (id) => `<defs>
+              <linearGradient id="g${id}" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#7c3aed"/><stop offset="1" stop-color="#38bdf8"/></linearGradient>
+              <style>
+                text{font-family:'Segoe UI',Ubuntu,'Helvetica Neue',Arial,sans-serif}
+                .title{font-size:17px;font-weight:700;fill:#c0caf5}
+                .label{font-size:13px;fill:#a9b1d6}
+                .val{font-size:14px;font-weight:700;fill:#c0caf5}
+                .muted{font-size:11px;fill:#787c99}
+                .big{font-size:30px;font-weight:700;fill:#c0caf5}
+                .mid{font-size:13px;font-weight:600;fill:#bb9af7}
+              </style></defs>`;
+            const frame = (W, H, id, inner, title) => `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(title)}">
+            ${defs(id)}
+            <rect x="0.5" y="0.5" width="${W - 1}" height="${H - 1}" rx="14" fill="#1a1b27" stroke="#2f3549"/>
+            ${inner}
+          </svg>`;
+
+            // ---------- 1) stats card ----------
+            const rows = [
+              ['Stars earned', stars, '#fbbf24'],
+              ['Public repos', own.length || profile.public_repos, '#a78bfa'],
+              ['Followers', profile.followers, '#38bdf8'],
+              ['Contributions (last year)', total, '#34d399'],
+              ['Active days (last year)', activeDays, '#f472b6'],
+            ];
+            let statRows = '';
+            rows.forEach(([label, value, color], i) => {
+              const y = 78 + i * 28;
+              statRows += `<circle cx="34" cy="${y - 4}" r="4.5" fill="${color}"/><text x="50" y="${y}" class="label">${label}</text><text x="386" y="${y}" class="val" text-anchor="end">${value}</text>`;
+            });
+            const statsSvg = frame(420, 220, 's', `
+            <rect x="22" y="24" width="4" height="22" rx="2" fill="url(#gs)"/>
+            <text x="34" y="42" class="title">${esc(user)}'s GitHub Stats</text>
+            ${statRows}`, `GitHub stats for ${user}`);
+
+            // ---------- 2) streak card ----------
+            const circ = 2 * Math.PI * 44;
+            const frac = Math.min(1, cur.len / Math.max(longest.len, 1));
+            const col = (cx, big, label, sub) => `<text x="${cx}" y="112" class="big" text-anchor="middle">${big}</text><text x="${cx}" y="140" class="label" text-anchor="middle">${label}</text><text x="${cx}" y="160" class="muted" text-anchor="middle">${sub}</text>`;
+            const streakSvg = frame(420, 220, 'k', `
+            <rect x="22" y="24" width="4" height="22" rx="2" fill="url(#gk)"/>
+            <text x="34" y="42" class="title">Contribution Streak</text>
+            ${col(72, total, 'Total', 'last year')}
+            <line x1="140" y1="84" x2="140" y2="176" stroke="#2f3549"/>
+            <g transform="translate(210,118)">
+              <circle r="44" fill="none" stroke="#24283b" stroke-width="7"/>
+              <circle r="44" fill="none" stroke="url(#gk)" stroke-width="7" stroke-linecap="round" stroke-dasharray="${(circ * frac).toFixed(1)} ${circ.toFixed(1)}" transform="rotate(-90)"/>
+              <text y="10" class="big" text-anchor="middle">${cur.len}</text>
+            </g>
+            <text x="210" y="186" class="mid" text-anchor="middle">Current streak</text>
+            <text x="210" y="204" class="muted" text-anchor="middle">${range(cur.start, cur.end)}</text>
+            <line x1="280" y1="84" x2="280" y2="176" stroke="#2f3549"/>
+            ${col(350, longest.len, 'Longest streak', range(longest.start, longest.end))}`, `Contribution streaks for ${user}`);
+
+            // ---------- 3) languages card ----------
+            const colors = { JavaScript: '#f1e05a', Java: '#ED8B00', Python: '#3572A5', HTML: '#e34c26', CSS: '#563d7c', C: '#a8b9cc', 'C++': '#f34b7d', TypeScript: '#3178c6', Dart: '#00B4AB', Kotlin: '#A97BFF', Shell: '#89e051', EJS: '#a91e50', SCSS: '#c6538c', 'Jupyter Notebook': '#DA5B0B' };
+            const fb = ['#7c3aed', '#38bdf8', '#f472b6', '#34d399', '#fbbf24'];
+            let lrows = '';
+            if (!langs.length) lrows = `<text x="34" y="86" class="muted">No language data yet</text>`;
+            langs.forEach(([name, b], i) => {
+              const pct = (b / langTotal) * 100, y = 72 + i * 28, c = colors[name] || fb[i % fb.length];
+              lrows += `<text x="34" y="${y}" class="label">${esc(name)}</text>
+                <text x="386" y="${y}" class="muted" text-anchor="end">${pct.toFixed(1)}%</text>
+                <rect x="34" y="${y + 8}" width="352" height="5" rx="2.5" fill="#24283b"/>
+                <rect x="34" y="${y + 8}" width="${Math.max(6, 352 * b / langTotal).toFixed(1)}" height="5" rx="2.5" fill="${c}"/>`;
+            });
+            const langSvg = frame(420, 72 + Math.max(langs.length, 1) * 28 + 6, 'l', `
+            <rect x="22" y="24" width="4" height="22" rx="2" fill="url(#gl)"/>
+            <text x="34" y="42" class="title">Most Used Languages</text>
+            ${lrows}`, `Top languages for ${user}`);
+
+            fs.mkdirSync('dist', { recursive: true });
+            fs.writeFileSync('dist/stats-card.svg', statsSvg);
+            fs.writeFileSync('dist/streak-card.svg', streakSvg);
+            fs.writeFileSync('dist/langs-card.svg', langSvg);
+            console.log({ total, activeDays, cur, longest, stars, repos: own.length, langs: langs.map((l) => l[0]) });
+          }
+          main().catch((e) => { console.error(e); process.exit(1); });
+          EOF
           node activity.js
+          node stats.js
 
       - uses: crazy-max/ghaction-github-pages@v3.1.0
         with:
