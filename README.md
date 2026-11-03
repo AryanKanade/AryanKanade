@@ -76,21 +76,10 @@
 
 <div align="center">
 
-<table>
-  <tr>
-    <td align="center">
-      <img width="400" alt="GitHub stats" src="https://raw.githubusercontent.com/AryanKanade/AryanKanade/activity/stats-card.svg?v=1" />
-    </td>
-    <td align="center">
-      <img width="400" alt="Contribution streak" src="https://raw.githubusercontent.com/AryanKanade/AryanKanade/activity/streak-card.svg?v=1" />
-    </td>
-  </tr>
-  <tr>
-    <td colspan="2" align="center">
-      <img width="400" alt="Most used languages" src="https://raw.githubusercontent.com/AryanKanade/AryanKanade/activity/langs-card.svg?v=1" />
-    </td>
-  </tr>
-</table>
+<img width="400" alt="GitHub stats" src="https://raw.githubusercontent.com/AryanKanade/AryanKanade/activity/stats-card.svg?v=2" />
+<img width="400" alt="Contribution streak" src="https://raw.githubusercontent.com/AryanKanade/AryanKanade/activity/streak-card.svg?v=2" />
+
+<img width="400" alt="Most used languages" src="https://raw.githubusercontent.com/AryanKanade/AryanKanade/activity/langs-card.svg?v=2" />
 
 </div>
 
