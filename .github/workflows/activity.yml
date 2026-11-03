@@ -194,86 +194,117 @@ jobs:
             const langs = Object.entries(bytes).sort((a, b) => b[1] - a[1]).slice(0, 5);
             const langTotal = Object.values(bytes).reduce((a, b) => a + b, 0) || 1;
 
-            // ---------- shared svg bits ----------
+            // ---------- shared svg bits (tokyonight look) ----------
+            const C = { bg: '#1a1b27', border: '#2f3549', title: '#70a5fd', text: '#38bdae', icon: '#bf91f3', purple: '#bf91f3', blue: '#70a5fd' };
             const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;');
             const fmtDate = (s) => new Date(s + 'T00:00:00Z').toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' });
-            const range = (a, b) => (a && b ? (a === b ? fmtDate(a) : `${fmtDate(a)} – ${fmtDate(b)}`) : 'no streak yet');
-            const defs = (id) => `<defs>
-              <linearGradient id="g${id}" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#7c3aed"/><stop offset="1" stop-color="#38bdf8"/></linearGradient>
-              <style>
-                text{font-family:'Segoe UI',Ubuntu,'Helvetica Neue',Arial,sans-serif}
-                .title{font-size:17px;font-weight:700;fill:#c0caf5}
-                .label{font-size:13px;fill:#a9b1d6}
-                .val{font-size:14px;font-weight:700;fill:#c0caf5}
-                .muted{font-size:11px;fill:#787c99}
-                .big{font-size:30px;font-weight:700;fill:#c0caf5}
-                .mid{font-size:13px;font-weight:600;fill:#bb9af7}
-              </style></defs>`;
-            const frame = (W, H, id, inner, title) => `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(title)}">
-            ${defs(id)}
-            <rect x="0.5" y="0.5" width="${W - 1}" height="${H - 1}" rx="14" fill="#1a1b27" stroke="#2f3549"/>
+            const fmtFull = (s) => new Date(s + 'T00:00:00Z').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' });
+            const range = (a, b) => (a && b ? (a === b ? fmtDate(a) : `${fmtDate(a)} - ${fmtDate(b)}`) : 'No streak yet');
+            const frame = (W, H, inner, title) => `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(title)}">
+            <style>
+              text{font-family:'Segoe UI',Ubuntu,'Helvetica Neue',Arial,sans-serif}
+              .title{font-size:19px;font-weight:600;fill:${C.title}}
+              .row{font-size:14px;font-weight:600;fill:${C.text}}
+              .num{font-size:14px;font-weight:700;fill:${C.text}}
+              .big{font-size:30px;font-weight:700;fill:${C.blue}}
+              .bigp{font-size:34px;font-weight:700;fill:${C.purple}}
+              .lab{font-size:14px;fill:${C.blue}}
+              .labp{font-size:14px;font-weight:700;fill:${C.purple}}
+              .date{font-size:12px;fill:${C.text}}
+              .leg{font-size:12px;fill:${C.text}}
+            </style>
+            <rect x="0.5" y="0.5" width="${W - 1}" height="${H - 1}" rx="4.5" fill="${C.bg}" stroke="${C.border}"/>
             ${inner}
           </svg>`;
+            const icon = (d, x, y) => `<svg x="${x}" y="${y}" width="16" height="16" viewBox="0 0 16 16"><path fill="${C.icon}" fill-rule="evenodd" d="${d}"/></svg>`;
+            const ICONS = {
+              star: 'M8 .25a.75.75 0 0 1 .673.418l1.882 3.815 4.21.612a.75.75 0 0 1 .416 1.279l-3.046 2.97.719 4.192a.75.75 0 0 1-1.088.791L8 12.347l-3.766 1.98a.75.75 0 0 1-1.088-.79l.72-4.194L.818 6.374a.75.75 0 0 1 .416-1.28l4.21-.611L7.327.668A.75.75 0 0 1 8 .25Z',
+              history: 'M1.643 3.143.427 1.927A.25.25 0 0 0 0 2.104V5.75c0 .138.112.25.25.25h3.646a.25.25 0 0 0 .177-.427L2.715 4.215a6.5 6.5 0 1 1-1.18 4.458.75.75 0 1 0-1.493.154 8.001 8.001 0 1 0 1.6-5.684ZM7.75 4a.75.75 0 0 1 .75.75v2.992l2.028.812a.75.75 0 0 1-.557 1.392l-2.5-1A.751.751 0 0 1 7 8.25v-3.5A.75.75 0 0 1 7.75 4Z',
+              calendar: 'M4.75 0a.75.75 0 0 1 .75.75V2h5V.75a.75.75 0 0 1 1.5 0V2h1.25c.966 0 1.75.784 1.75 1.75v10.5A1.75 1.75 0 0 1 13.25 16H2.75A1.75 1.75 0 0 1 1 14.25V3.75C1 2.784 1.784 2 2.75 2H4V.75A.75.75 0 0 1 4.75 0ZM2.5 7.5v6.75c0 .138.112.25.25.25h10.5a.25.25 0 0 0 .25-.25V7.5Zm10.75-4H2.75a.25.25 0 0 0-.25.25V6h11V3.75a.25.25 0 0 0-.25-.25Z',
+              repo: 'M2 2.5A2.5 2.5 0 0 1 4.5 0h8.75a.75.75 0 0 1 .75.75v12.5a.75.75 0 0 1-.75.75h-2.5a.75.75 0 0 1 0-1.5h1.75v-2h-8a1 1 0 0 0-.714 1.7.75.75 0 1 1-1.072 1.05A2.495 2.495 0 0 1 2 11.5Zm10.5-1h-8a1 1 0 0 0-1 1v6.708A2.486 2.486 0 0 1 4.5 9h8ZM5 12.25a.25.25 0 0 1 .25-.25h3.5a.25.25 0 0 1 .25.25v3.25a.25.25 0 0 1-.4.2l-1.45-1.087a.249.249 0 0 0-.3 0L5.4 15.7a.25.25 0 0 1-.4-.2Z',
+              people: 'M2 5.5a3.5 3.5 0 1 1 5.898 2.549 5.508 5.508 0 0 1 3.034 4.084.75.75 0 1 1-1.482.235 4 4 0 0 0-7.9 0 .75.75 0 0 1-1.482-.236A5.507 5.507 0 0 1 3.102 8.05 3.493 3.493 0 0 1 2 5.5ZM11 4a3.001 3.001 0 0 1 2.22 5.018 5.01 5.01 0 0 1 2.56 3.012.749.749 0 0 1-.885.954.752.752 0 0 1-.549-.514 3.507 3.507 0 0 0-2.522-2.372.75.75 0 0 1-.574-.73v-.352a.75.75 0 0 1 .416-.672A1.5 1.5 0 0 0 11 5.5.75.75 0 0 1 11 4Zm-5.5-.5a2 2 0 1 0-.001 3.999A2 2 0 0 0 5.5 3.5Z',
+            };
 
             // ---------- 1) stats card ----------
+            const W = 480;
             const rows = [
-              ['Stars earned', stars, '#fbbf24'],
-              ['Public repos', own.length || profile.public_repos, '#a78bfa'],
-              ['Followers', profile.followers, '#38bdf8'],
-              ['Contributions (last year)', total, '#34d399'],
-              ['Active days (last year)', activeDays, '#f472b6'],
+              ['star', 'Total Stars Earned:', stars],
+              ['history', 'Contributions (last year):', total],
+              ['calendar', 'Active Days (last year):', activeDays],
+              ['repo', 'Public Repos:', own.length || profile.public_repos],
+              ['people', 'Followers:', profile.followers],
             ];
             let statRows = '';
-            rows.forEach(([label, value, color], i) => {
-              const y = 78 + i * 28;
-              statRows += `<circle cx="34" cy="${y - 4}" r="4.5" fill="${color}"/><text x="50" y="${y}" class="label">${label}</text><text x="386" y="${y}" class="val" text-anchor="end">${value}</text>`;
+            rows.forEach(([ic, label, value], i) => {
+              const y = 74 + i * 28;
+              statRows += `${icon(ICONS[ic], 28, y - 13)}<text x="54" y="${y}" class="row">${label}</text><text x="300" y="${y}" class="num">${value}</text>`;
             });
-            const statsSvg = frame(420, 220, 's', `
-            <rect x="22" y="24" width="4" height="22" rx="2" fill="url(#gs)"/>
-            <text x="34" y="42" class="title">${esc(user)}'s GitHub Stats</text>
-            ${statRows}`, `GitHub stats for ${user}`);
+            const pct = Math.round((activeDays / days.length) * 100);
+            const rc = 2 * Math.PI * 40;
+            const statsSvg = frame(W, 200, `
+            <text x="28" y="38" class="title">${esc(user)}'s GitHub Stats</text>
+            ${statRows}
+            <g transform="translate(398,112)">
+              <circle r="40" fill="none" stroke="#2a2f4a" stroke-width="6"/>
+              <circle r="40" fill="none" stroke="${C.blue}" stroke-width="6" stroke-linecap="round" stroke-dasharray="${(rc * pct / 100).toFixed(1)} ${rc.toFixed(1)}" transform="rotate(-90)"/>
+              <text y="8" class="big" text-anchor="middle" style="font-size:24px;fill:${C.text}">${pct}%</text>
+              <text y="58" class="date" text-anchor="middle">active</text>
+            </g>`, `GitHub stats for ${user}`);
 
             // ---------- 2) streak card ----------
-            const circ = 2 * Math.PI * 44;
-            const frac = Math.min(1, cur.len / Math.max(longest.len, 1));
-            const col = (cx, big, label, sub) => `<text x="${cx}" y="112" class="big" text-anchor="middle">${big}</text><text x="${cx}" y="140" class="label" text-anchor="middle">${label}</text><text x="${cx}" y="160" class="muted" text-anchor="middle">${sub}</text>`;
-            const streakSvg = frame(420, 220, 'k', `
-            <rect x="22" y="24" width="4" height="22" rx="2" fill="url(#gk)"/>
-            <text x="34" y="42" class="title">Contribution Streak</text>
-            ${col(72, total, 'Total', 'last year')}
-            <line x1="140" y1="84" x2="140" y2="176" stroke="#2f3549"/>
-            <g transform="translate(210,118)">
-              <circle r="44" fill="none" stroke="#24283b" stroke-width="7"/>
-              <circle r="44" fill="none" stroke="url(#gk)" stroke-width="7" stroke-linecap="round" stroke-dasharray="${(circ * frac).toFixed(1)} ${circ.toFixed(1)}" transform="rotate(-90)"/>
-              <text y="10" class="big" text-anchor="middle">${cur.len}</text>
+            const circ = 2 * Math.PI * 40;
+            const flame = `<path fill="${C.blue}" d="M0 -9 C2 -5 6 -3 6 2 C6 6 3 9 0 9 C-3 9 -6 6 -6 2 C-6 -1 -4 -3 -3 -5 C-2 -3 -1 -2 0 -3 C1 -5 0 -7 0 -9 Z"/>`;
+            const first = fmtFull(days[0].date);
+            const streakSvg = frame(W, 200, `
+            <g text-anchor="middle">
+              <text x="80" y="104" class="big">${total}</text>
+              <text x="80" y="134" class="lab">Total Contributions</text>
+              <text x="80" y="158" class="date">${first} - Present</text>
             </g>
-            <text x="210" y="186" class="mid" text-anchor="middle">Current streak</text>
-            <text x="210" y="204" class="muted" text-anchor="middle">${range(cur.start, cur.end)}</text>
-            <line x1="280" y1="84" x2="280" y2="176" stroke="#2f3549"/>
-            ${col(350, longest.len, 'Longest streak', range(longest.start, longest.end))}`, `Contribution streaks for ${user}`);
+            <line x1="160" y1="40" x2="160" y2="160" stroke="#dfe3f0" stroke-width="1" opacity="0.85"/>
+            <g transform="translate(240,86)">
+              <circle r="40" fill="none" stroke="${C.blue}" stroke-width="5" stroke-dasharray="${(circ * 0.9).toFixed(1)} ${circ.toFixed(1)}" stroke-linecap="round" transform="rotate(-72)"/>
+              <text y="12" class="bigp" text-anchor="middle">${cur.len}</text>
+              <g transform="translate(0,-40)">${flame}</g>
+            </g>
+            <g text-anchor="middle">
+              <text x="240" y="152" class="labp">Current Streak</text>
+              <text x="240" y="174" class="date">${cur.len ? range(cur.start, cur.end) : 'No streak yet'}</text>
+            </g>
+            <line x1="320" y1="40" x2="320" y2="160" stroke="#dfe3f0" stroke-width="1" opacity="0.85"/>
+            <g text-anchor="middle">
+              <text x="400" y="104" class="big">${longest.len}</text>
+              <text x="400" y="134" class="lab">Longest Streak</text>
+              <text x="400" y="158" class="date">${range(longest.start, longest.end)}</text>
+            </g>`, `Contribution streaks for ${user}`);
 
             // ---------- 3) languages card ----------
-            const colors = { JavaScript: '#f1e05a', Java: '#ED8B00', Python: '#3572A5', HTML: '#e34c26', CSS: '#563d7c', C: '#a8b9cc', 'C++': '#f34b7d', TypeScript: '#3178c6', Dart: '#00B4AB', Kotlin: '#A97BFF', Shell: '#89e051', EJS: '#a91e50', SCSS: '#c6538c', 'Jupyter Notebook': '#DA5B0B' };
-            const fb = ['#7c3aed', '#38bdf8', '#f472b6', '#34d399', '#fbbf24'];
-            let lrows = '';
-            if (!langs.length) lrows = `<text x="34" y="86" class="muted">No language data yet</text>`;
-            langs.forEach(([name, b], i) => {
-              const pct = (b / langTotal) * 100, y = 72 + i * 28, c = colors[name] || fb[i % fb.length];
-              lrows += `<text x="34" y="${y}" class="label">${esc(name)}</text>
-                <text x="386" y="${y}" class="muted" text-anchor="end">${pct.toFixed(1)}%</text>
-                <rect x="34" y="${y + 8}" width="352" height="5" rx="2.5" fill="#24283b"/>
-                <rect x="34" y="${y + 8}" width="${Math.max(6, 352 * b / langTotal).toFixed(1)}" height="5" rx="2.5" fill="${c}"/>`;
+            const colors = { JavaScript: '#f1e05a', Java: '#b07219', Python: '#3572A5', HTML: '#e34c26', CSS: '#663399', C: '#a8b9cc', 'C++': '#f34b7d', TypeScript: '#3178c6', Dart: '#00B4AB', Kotlin: '#A97BFF', Shell: '#89e051', EJS: '#a91e50', SCSS: '#c6538c', 'Jupyter Notebook': '#DA5B0B' };
+            const fb = ['#7c3aed', '#38bdf8', '#f472b6', '#34d399', '#fbbf24', '#fb923c'];
+            const top = Object.entries(bytes).sort((a, b) => b[1] - a[1]).slice(0, 6);
+            const topTotal = top.reduce((a, l) => a + l[1], 0) || 1;
+            const barX = 28, barW = W - 56;
+            let seg = '', off = 0, legend = '';
+            top.forEach(([name, b], i) => {
+              const w = (b / topTotal) * barW, c = colors[name] || fb[i % fb.length];
+              seg += `<rect x="${(barX + off).toFixed(1)}" y="54" width="${Math.max(w, 1).toFixed(1)}" height="9" fill="${c}"/>`;
+              off += w;
+              const col = i % 2, row = Math.floor(i / 2);
+              legend += `<circle cx="${34 + col * 220}" cy="${96 + row * 22}" r="5" fill="${c}"/><text x="${46 + col * 220}" y="${100 + row * 22}" class="leg">${esc(name)} ${((b / topTotal) * 100).toFixed(2)}%</text>`;
             });
-            const langSvg = frame(420, 72 + Math.max(langs.length, 1) * 28 + 6, 'l', `
-            <rect x="22" y="24" width="4" height="22" rx="2" fill="url(#gl)"/>
-            <text x="34" y="42" class="title">Most Used Languages</text>
-            ${lrows}`, `Top languages for ${user}`);
+            if (!top.length) legend = `<text x="28" y="100" class="leg">No language data yet</text>`;
+            const rowsN = Math.max(1, Math.ceil(top.length / 2));
+            const langSvg = frame(W, 96 + rowsN * 22 + 16, `
+            <text x="28" y="38" class="title">Most Used Languages</text>
+            <clipPath id="bar"><rect x="${barX}" y="54" width="${barW}" height="9" rx="4.5"/></clipPath>
+            <g clip-path="url(#bar)">${seg}</g>
+            ${legend}`, `Top languages for ${user}`);
 
             fs.mkdirSync('dist', { recursive: true });
             fs.writeFileSync('dist/stats-card.svg', statsSvg);
             fs.writeFileSync('dist/streak-card.svg', streakSvg);
             fs.writeFileSync('dist/langs-card.svg', langSvg);
-            console.log({ total, activeDays, cur, longest, stars, repos: own.length, langs: langs.map((l) => l[0]) });
+            console.log({ total, activeDays, cur, longest, stars, repos: own.length, langs: top.map((l) => l[0]) });
           }
           main().catch((e) => { console.error(e); process.exit(1); });
           EOF
