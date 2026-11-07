@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="480" height="200" viewBox="0 0 480 200" role="img" aria-label="Contribution streaks for AryanKanade">
+  <style>
+    text{font-family:'Segoe UI',Ubuntu,'Helvetica Neue',Arial,sans-serif}
+    .title{font-size:19px;font-weight:600;fill:#70a5fd}
+    .row{font-size:14px;font-weight:600;fill:#38bdae}
+    .num{font-size:14px;font-weight:700;fill:#38bdae}
+    .big{font-size:30px;font-weight:700;fill:#70a5fd}
+    .bigp{font-size:34px;font-weight:700;fill:#bf91f3}
+    .lab{font-size:14px;fill:#70a5fd}
+    .labp{font-size:14px;font-weight:700;fill:#bf91f3}
+    .date{font-size:12px;fill:#38bdae}
+    .leg{font-size:12px;fill:#38bdae}
+  </style>
+  <rect x="0.5" y="0.5" width="479" height="199" rx="4.5" fill="#1a1b27" stroke="#2f3549"/>
+  
+  <g text-anchor="middle">
+    <text x="80" y="104" class="big">163</text>
+    <text x="80" y="134" class="lab">Total Contributions</text>
+    <text x="80" y="158" class="date">Nov 2, 2025 - Present</text>
+  </g>
+  <line x1="160" y1="40" x2="160" y2="160" stroke="#dfe3f0" stroke-width="1" opacity="0.85"/>
+  <g transform="translate(240,86)">
+    <circle r="40" fill="none" stroke="#70a5fd" stroke-width="5" stroke-dasharray="226.2 251.3" stroke-linecap="round" transform="rotate(-72)"/>
+    <text y="12" class="bigp" text-anchor="middle">0</text>
+    <g transform="translate(0,-40)"><path fill="#70a5fd" d="M0 -9 C2 -5 6 -3 6 2 C6 6 3 9 0 9 C-3 9 -6 6 -6 2 C-6 -1 -4 -3 -3 -5 C-2 -3 -1 -2 0 -3 C1 -5 0 -7 0 -9 Z"/></g>
+  </g>
+  <g text-anchor="middle">
+    <text x="240" y="152" class="labp">Current Streak</text>
+    <text x="240" y="174" class="date">No streak yet</text>
+  </g>
+  <line x1="320" y1="40" x2="320" y2="160" stroke="#dfe3f0" stroke-width="1" opacity="0.85"/>
+  <g text-anchor="middle">
+    <text x="400" y="104" class="big">9</text>
+    <text x="400" y="134" class="lab">Longest Streak</text>
+    <text x="400" y="158" class="date">Aug 26 - Sep 3</text>
+  </g>
+</svg>
