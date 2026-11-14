@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="480" height="200" viewBox="0 0 480 200" role="img" aria-label="GitHub stats for AryanKanade">
+  <style>
+    text{font-family:'Segoe UI',Ubuntu,'Helvetica Neue',Arial,sans-serif}
+    .title{font-size:19px;font-weight:600;fill:#70a5fd}
+    .row{font-size:14px;font-weight:600;fill:#38bdae}
+    .num{font-size:14px;font-weight:700;fill:#38bdae}
+    .big{font-size:30px;font-weight:700;fill:#70a5fd}
+    .bigp{font-size:34px;font-weight:700;fill:#bf91f3}
+    .lab{font-size:14px;fill:#70a5fd}
+    .labp{font-size:14px;font-weight:700;fill:#bf91f3}
+    .date{font-size:12px;fill:#38bdae}
+    .leg{font-size:12px;fill:#38bdae}
+  </style>
+  <rect x="0.5" y="0.5" width="479" height="199" rx="4.5" fill="#1a1b27" stroke="#2f3549"/>
+  
+  <text x="28" y="38" class="title">AryanKanade's GitHub Stats</text>
+  <svg x="28" y="61" width="16" height="16" viewBox="0 0 16 16"><path fill="#bf91f3" fill-rule="evenodd" d="M8 .25a.75.75 0 0 1 .673.418l1.882 3.815 4.21.612a.75.75 0 0 1 .416 1.279l-3.046 2.97.719 4.192a.75.75 0 0 1-1.088.791L8 12.347l-3.766 1.98a.75.75 0 0 1-1.088-.79l.72-4.194L.818 6.374a.75.75 0 0 1 .416-1.28l4.21-.611L7.327.668A.75.75 0 0 1 8 .25Z"/></svg><text x="54" y="74" class="row">Total Stars Earned:</text><text x="300" y="74" class="num">1</text><svg x="28" y="89" width="16" height="16" viewBox="0 0 16 16"><path fill="#bf91f3" fill-rule="evenodd" d="M1.643 3.143.427 1.927A.25.25 0 0 0 0 2.104V5.75c0 .138.112.25.25.25h3.646a.25.25 0 0 0 .177-.427L2.715 4.215a6.5 6.5 0 1 1-1.18 4.458.75.75 0 1 0-1.493.154 8.001 8.001 0 1 0 1.6-5.684ZM7.75 4a.75.75 0 0 1 .75.75v2.992l2.028.812a.75.75 0 0 1-.557 1.392l-2.5-1A.751.751 0 0 1 7 8.25v-3.5A.75.75 0 0 1 7.75 4Z"/></svg><text x="54" y="102" class="row">Contributions (last year):</text><text x="300" y="102" class="num">168</text><svg x="28" y="117" width="16" height="16" viewBox="0 0 16 16"><path fill="#bf91f3" fill-rule="evenodd" d="M4.75 0a.75.75 0 0 1 .75.75V2h5V.75a.75.75 0 0 1 1.5 0V2h1.25c.966 0 1.75.784 1.75 1.75v10.5A1.75 1.75 0 0 1 13.25 16H2.75A1.75 1.75 0 0 1 1 14.25V3.75C1 2.784 1.784 2 2.75 2H4V.75A.75.75 0 0 1 4.75 0ZM2.5 7.5v6.75c0 .138.112.25.25.25h10.5a.25.25 0 0 0 .25-.25V7.5Zm10.75-4H2.75a.25.25 0 0 0-.25.25V6h11V3.75a.25.25 0 0 0-.25-.25Z"/></svg><text x="54" y="130" class="row">Active Days (last year):</text><text x="300" y="130" class="num">61</text><svg x="28" y="145" width="16" height="16" viewBox="0 0 16 16"><path fill="#bf91f3" fill-rule="evenodd" d="M2 2.5A2.5 2.5 0 0 1 4.5 0h8.75a.75.75 0 0 1 .75.75v12.5a.75.75 0 0 1-.75.75h-2.5a.75.75 0 0 1 0-1.5h1.75v-2h-8a1 1 0 0 0-.714 1.7.75.75 0 1 1-1.072 1.05A2.495 2.495 0 0 1 2 11.5Zm10.5-1h-8a1 1 0 0 0-1 1v6.708A2.486 2.486 0 0 1 4.5 9h8ZM5 12.25a.25.25 0 0 1 .25-.25h3.5a.25.25 0 0 1 .25.25v3.25a.25.25 0 0 1-.4.2l-1.45-1.087a.249.249 0 0 0-.3 0L5.4 15.7a.25.25 0 0 1-.4-.2Z"/></svg><text x="54" y="158" class="row">Public Repos:</text><text x="300" y="158" class="num">5</text><svg x="28" y="173" width="16" height="16" viewBox="0 0 16 16"><path fill="#bf91f3" fill-rule="evenodd" d="M2 5.5a3.5 3.5 0 1 1 5.898 2.549 5.508 5.508 0 0 1 3.034 4.084.75.75 0 1 1-1.482.235 4 4 0 0 0-7.9 0 .75.75 0 0 1-1.482-.236A5.507 5.507 0 0 1 3.102 8.05 3.493 3.493 0 0 1 2 5.5ZM11 4a3.001 3.001 0 0 1 2.22 5.018 5.01 5.01 0 0 1 2.56 3.012.749.749 0 0 1-.885.954.752.752 0 0 1-.549-.514 3.507 3.507 0 0 0-2.522-2.372.75.75 0 0 1-.574-.73v-.352a.75.75 0 0 1 .416-.672A1.5 1.5 0 0 0 11 5.5.75.75 0 0 1 11 4Zm-5.5-.5a2 2 0 1 0-.001 3.999A2 2 0 0 0 5.5 3.5Z"/></svg><text x="54" y="186" class="row">Followers:</text><text x="300" y="186" class="num">5</text>
+  <g transform="translate(398,112)">
+    <circle r="40" fill="none" stroke="#2a2f4a" stroke-width="6"/>
+    <circle r="40" fill="none" stroke="#70a5fd" stroke-width="6" stroke-linecap="round" stroke-dasharray="40.2 251.3" transform="rotate(-90)"/>
+    <text y="8" class="big" text-anchor="middle" style="font-size:24px;fill:#38bdae">16%</text>
+    <text y="58" class="date" text-anchor="middle">active</text>
+  </g>
+</svg>

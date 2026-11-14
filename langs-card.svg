@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="480" height="156" viewBox="0 0 480 156" role="img" aria-label="Top languages for AryanKanade">
+  <style>
+    text{font-family:'Segoe UI',Ubuntu,'Helvetica Neue',Arial,sans-serif}
+    .title{font-size:19px;font-weight:600;fill:#70a5fd}
+    .row{font-size:14px;font-weight:600;fill:#38bdae}
+    .num{font-size:14px;font-weight:700;fill:#38bdae}
+    .big{font-size:30px;font-weight:700;fill:#70a5fd}
+    .bigp{font-size:34px;font-weight:700;fill:#bf91f3}
+    .lab{font-size:14px;fill:#70a5fd}
+    .labp{font-size:14px;font-weight:700;fill:#bf91f3}
+    .date{font-size:12px;fill:#38bdae}
+    .leg{font-size:12px;fill:#38bdae}
+  </style>
+  <rect x="0.5" y="0.5" width="479" height="155" rx="4.5" fill="#1a1b27" stroke="#2f3549"/>
+  
+  <text x="28" y="38" class="title">Most Used Languages</text>
+  <clipPath id="bar"><rect x="28" y="54" width="424" height="9" rx="4.5"/></clipPath>
+  <g clip-path="url(#bar)"><rect x="28.0" y="54" width="259.5" height="9" fill="#f1e05a"/><rect x="287.5" y="54" width="95.6" height="9" fill="#b07219"/><rect x="383.1" y="54" width="54.2" height="9" fill="#e34c26"/><rect x="437.3" y="54" width="14.7" height="9" fill="#663399"/></g>
+  <circle cx="34" cy="96" r="5" fill="#f1e05a"/><text x="46" y="100" class="leg">JavaScript 61.20%</text><circle cx="254" cy="96" r="5" fill="#b07219"/><text x="266" y="100" class="leg">Java 22.56%</text><circle cx="34" cy="118" r="5" fill="#e34c26"/><text x="46" y="122" class="leg">HTML 12.78%</text><circle cx="254" cy="118" r="5" fill="#663399"/><text x="266" y="122" class="leg">CSS 3.46%</text>
+</svg>
